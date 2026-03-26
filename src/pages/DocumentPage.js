@@ -3,16 +3,18 @@ import { useParams, Link } from 'react-router-dom';
 import { getDocument } from '../utils/api';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 import { getCategoryMeta, formatCategory } from '../utils/categories';
+import { formatName } from '../utils/format';
 
-export default function DocumentPage() {
-  const { id } = useParams();
+export default function DocumentPage({ selectedLanguage }) {
+  const paramsUrl = useParams();
+  const id = paramsUrl['*'];
   const [doc, setDoc] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     setLoading(true);
-    getDocument(id)
+    getDocument(id, selectedLanguage)
       .then(r => setDoc(r.data))
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
@@ -20,7 +22,13 @@ export default function DocumentPage() {
 
   if (loading) return (
     <div className="loading">
-      <div className="spinner" />
+      <div className="loading">
+        <div className="spinner-container">
+          <div className="spinner" />
+          <div className="spinner-inner" />
+        </div>
+        <p>initialising hub…</p>
+      </div>
       <p>decoding file structure…</p>
     </div>
   );
@@ -38,7 +46,7 @@ export default function DocumentPage() {
         <span className="sep">/</span>
         <Link to={`/category/${doc.category}`}>{doc.category}</Link>
         <span className="sep">/</span>
-        <span className="active-path">{doc.title}{isPython ? '.py' : '.md'}</span>
+        <span className="active-path">{formatName(doc.title)}{isPython ? '.py' : '.md'}</span>
       </nav>
 
       {/* Header - Only for Non-Python/Documentation files */}
@@ -50,7 +58,7 @@ export default function DocumentPage() {
             </span>
             <span className="type-pill markdown">📝 Documentation</span>
           </div>
-          <h1>{doc.title}</h1>
+          <h1>{formatName(doc.title)}</h1>
           <div className="doc-stats">
             {doc.wordCount > 0 && <span>{doc.wordCount.toLocaleString()} words</span>}
             {doc.lines > 0 && <span>{doc.lines} lines</span>}
