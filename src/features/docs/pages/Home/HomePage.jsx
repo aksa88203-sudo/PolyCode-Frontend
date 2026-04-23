@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getDocuments, getStats, getCategories } from "../services/api";
-import LazyDocCard from "../components/LazyDocCard";
+import { getDocuments, getStats, getCategories } from "../../services/api";
+import LazyDocCard from "../../components/LazyDocCard";
 import {
   getCategoryMeta,
   formatCategory,
-} from "../../../shared/utils/categories";
-import {
-  SkeletonGrid,
-  PageSkeleton,
-} from "../../../shared/components/SkeletonLoader";
+} from "../../../../shared/utils/categories";
+import { PageSkeleton } from "../../../../shared/components/SkeletonLoader";
+import LoadingPage from "./LoadingPage";
 
 export default function HomePage({ selectedLanguage }) {
   const [categories, setCategories] = useState([]);
@@ -54,43 +52,9 @@ export default function HomePage({ selectedLanguage }) {
 
   if (loading && !initialLoad) {
     return (
-      <div>
-        {/* ── Hero ── */}
-        <section className="hero fade-up">
-          <div className="hero-eyebrow">
-            <span>Available for code collaboration</span>
-          </div>
-
-          <h1>
-            Master {selectedLanguage || "Programming"} with <br />
-            <span className="gradient-text">Absolute Precision.</span>
-          </h1>
-
-          <p>
-            I provide a curated collection of{" "}
-            {selectedLanguage || "programming"} algorithms, data structures, and
-            technical documentation designed for high-performance engineers.
-          </p>
-
-          <div className="hero-actions">
-            <Link to="/search" className="btn-primary">
-              Explore Documentation <span style={{ marginLeft: "4px" }}>→</span>
-            </Link>
-          </div>
-        </section>
-
-        <div className="divider-accent" style={{ opacity: 0.1 }} />
-
-        {/* ── Loading Skeleton Grid ── */}
-        <section style={{ marginBottom: "80px" }}>
-          <div className="section-header" style={{ marginBottom: "32px" }}>
-            <span className="section-title">Latest Archives</span>
-            <span className="section-label">Documentation & Scripts</span>
-          </div>
-
-          <SkeletonGrid count={6} type="doc" />
-        </section>
-      </div>
+      <>
+        <LoadingPage selectedLanguage={selectedLanguage} />
+      </>
     );
   }
 

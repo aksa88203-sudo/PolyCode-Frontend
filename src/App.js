@@ -8,7 +8,7 @@ import {
 import Navbar from "./features/navigation/components/Navbar";
 import Sidebar from "./features/navigation/components/Sidebar";
 import LanguageSelectPage from "./features/language/pages/LanguageSelectPage";
-import HomePage from "./features/docs/pages/HomePage";
+import HomePage from "./features/docs/pages/Home/HomePage";
 import DocumentPage from "./features/docs/pages/DocumentPage";
 import CategoryPage from "./features/docs/pages/CategoryPage";
 import SearchPage from "./features/docs/pages/SearchPage";
@@ -21,6 +21,9 @@ function App() {
   const [selectedLanguage, setSelectedLanguage] = React.useState(
     () => localStorage.getItem("selectedLanguage") || null,
   );
+  const [theme, setTheme] = React.useState(
+    () => localStorage.getItem("theme") || "dark",
+  );
 
   const toggleSidebar = () => setIsSidebarOpen((o) => !o);
   const closeSidebar = () => setIsSidebarOpen(false);
@@ -30,13 +33,27 @@ function App() {
     setSelectedLanguage(language);
   };
 
+  const toggleTheme = React.useCallback(() => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  }, []);
+
+  React.useEffect(() => {
+    localStorage.setItem("theme", theme);
+    document.documentElement.setAttribute("data-theme", theme);
+    document.body.classList.toggle("light-theme", theme === "light");
+  }, [theme]);
+
   return (
     <PlaygroundProvider>
       <Router>
-        <div className="app">
+        <div className={`app ${theme === "light" ? "theme-light" : ""}`}>
           {selectedLanguage ? (
             <>
-              <Navbar toggleSidebar={toggleSidebar} />
+              <Navbar
+                toggleSidebar={toggleSidebar}
+                theme={theme}
+                onToggleTheme={toggleTheme}
+              />
               <div className="layout">
                 {isSidebarOpen && (
                   <div className="backdrop" onClick={closeSidebar}></div>
@@ -60,7 +77,10 @@ function App() {
                     <Route
                       path="/doc/*"
                       element={
-                        <DocumentPage selectedLanguage={selectedLanguage} />
+                        <DocumentPage
+                          selectedLanguage={selectedLanguage}
+                          theme={theme}
+                        />
                       }
                     />
                     <Route
@@ -80,6 +100,7 @@ function App() {
                       path="/playground"
                       element={
                         <PlaygroundPage
+                          theme={theme}
                           onToggleSidebar={toggleSidebar}
                           sidebarOpen={isSidebarOpen}
                         />
